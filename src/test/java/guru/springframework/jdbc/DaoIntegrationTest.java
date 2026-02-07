@@ -54,9 +54,11 @@ public class DaoIntegrationTest {
     void testInsertAuthor() {
         Author author = new Author();
         author.setFirstName("John");
-        author.setLastName("t");
+        author.setLastName("t222");
 
         Author saved = authorDao.saveNewAuthor(author);
+
+        System.out.println("New Id is: " + saved.getId());
 
         assertThat(saved).isNotNull();
     }

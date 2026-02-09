@@ -2,7 +2,9 @@ package guru.springframework.jdbc;
 
 
 import guru.springframework.jdbc.dao.AuthorDao;
+import guru.springframework.jdbc.dao.BookDao;
 import guru.springframework.jdbc.domain.Author;
+import guru.springframework.jdbc.domain.Book;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,6 +24,68 @@ public class DaoIntegrationTest {
 
     @Autowired
     AuthorDao authorDao;
+
+    @Autowired
+    BookDao bookDAO;
+
+    @Test
+    void testDeleteBook() {
+        Book book = new Book();
+        book.setIsbn("1234");
+        book.setPublisher("Self");
+        book.setTitle("my book");
+        Book saved = bookDAO.saveNewBook(book);
+
+        bookDAO.deleteBookById(saved.getId());
+
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            bookDAO.getById(saved.getId());
+        });
+    }
+
+    @Test
+    void updateBookTest() {
+        Book book = new Book();
+        book.setIsbn("1234");
+        book.setPublisher("Self");
+        book.setTitle("my book");
+        book.setAuthorId(1L);
+        Book saved = bookDAO.saveNewBook(book);
+
+        saved.setTitle("New Book");
+        bookDAO.updateBook(saved);
+
+        Book fetched = bookDAO.getById(saved.getId());
+
+        assertThat(fetched.getTitle()).isEqualTo("New Book");
+    }
+
+    @Test
+    void testSaveBook() {
+        Book book = new Book();
+        book.setIsbn("1234");
+        book.setPublisher("Self");
+        book.setTitle("my book");
+        book.setAuthorId(1L);
+
+        Book saved = bookDAO.saveNewBook(book);
+
+        assertThat(saved).isNotNull();
+    }
+
+    @Test
+    void testGetBookByName() {
+        Book book = bookDAO.findBookByTitle("Clean Code");
+
+        assertThat(book).isNotNull();
+    }
+
+    @Test
+    void testGetBook() {
+        Book book = bookDAO.getById(3L);
+
+        assertThat(book).isNotNull();
+    }
 
     @Test
     void testDeleteAuthor() {
